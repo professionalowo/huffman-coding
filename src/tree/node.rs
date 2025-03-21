@@ -6,8 +6,8 @@ pub(crate) enum Node {
     Leaf(NodeData),
     Node {
         data: NodeData,
-        left: Box<Node>,
-        right: Box<Node>,
+        left: Box<Self>,
+        right: Box<Self>,
     },
 }
 
@@ -15,6 +15,18 @@ impl Node {
     pub fn data(&self) -> &NodeData {
         match self {
             Self::Leaf(data) | Self::Node { data, .. } => data,
+        }
+    }
+
+    pub fn leaf(data: NodeData) -> Self {
+        Self::Leaf(data)
+    }
+
+    pub fn node(data: NodeData, left: Self, right: Self) -> Self {
+        Self::Node {
+            data,
+            left: Box::new(left),
+            right: Box::new(right),
         }
     }
 }
