@@ -1,5 +1,6 @@
 use super::node_data::NodeData;
 
+#[derive(Debug)]
 pub(crate) enum Node {
     Leaf(NodeData),
     Node {

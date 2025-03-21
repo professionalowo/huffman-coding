@@ -3,6 +3,7 @@ use node::Node;
 mod node;
 mod node_data;
 
+#[derive(Debug)]
 pub(crate) struct HuffmanTree {
     root: Option<Node>,
 }
