@@ -1,4 +1,5 @@
 use super::node_data::NodeData;
+use std::cmp::Ordering;
 
 #[derive(Debug)]
 pub(crate) enum Node {
@@ -19,13 +20,13 @@ impl Node {
 }
 
 impl Ord for Node {
-    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+    fn cmp(&self, other: &Self) -> Ordering {
         self.data().cmp(other.data())
     }
 }
 
 impl PartialOrd for Node {
-    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(other))
     }
 }
