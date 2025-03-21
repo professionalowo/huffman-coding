@@ -1,5 +1,6 @@
 use std::cmp::Ordering;
 
+#[derive(Debug)]
 pub(crate) struct NodeData {
     data: char,
     freq: u64,
