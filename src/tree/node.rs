@@ -1,7 +1,7 @@
 use super::node_data::NodeData;
 use std::cmp::Ordering;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Node {
     Leaf(NodeData),
     Node {
