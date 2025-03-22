@@ -32,13 +32,13 @@ impl HuffmanTree {
     }
 
     pub fn from_text(text: &str) -> Self {
-        let heap = Reverse(max_heap(text));
-        println!("{:#?}", heap);
+        let min_heap = Reverse(max_heap(text));
+        println!("{:#?}", min_heap);
         HuffmanTree::empty()
     }
 }
 
-fn freq_map(text: &str) -> HashMap<char, u64> {
+pub(crate) fn freq_map(text: &str) -> HashMap<char, u64> {
     let freq_map: HashMap<char, u64> = text.chars().fold(HashMap::new(), |mut map, c| {
         *map.entry(c).or_insert(0) += 1;
         map
@@ -46,14 +46,13 @@ fn freq_map(text: &str) -> HashMap<char, u64> {
     freq_map
 }
 
-fn max_heap(text:&str) -> BinaryHeap<NodeData>{
-    freq_map(text).into_iter().fold(
-        BinaryHeap::<NodeData>::new(),
-        |mut heap, pair| {
+pub(crate) fn max_heap(text: &str) -> BinaryHeap<NodeData> {
+    freq_map(text)
+        .into_iter()
+        .fold(BinaryHeap::<NodeData>::new(), |mut heap, pair| {
             heap.push(pair.into());
             heap
-        },
-    )
+        })
 }
 
 #[cfg(test)]
@@ -70,7 +69,7 @@ mod tests {
     fn max_heap_test() {
         let result = max_heap("aab");
 
-        let expected = BinaryHeap::from([NodeData::new('a', 2),NodeData::new('b', 1)]);
+        let expected = BinaryHeap::from([NodeData::new('a', 2), NodeData::new('b', 1)]);
         assert!(result.iter().eq(expected.iter()))
     }
 }
