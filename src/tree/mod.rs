@@ -32,9 +32,18 @@ impl HuffmanTree {
     }
 
     pub fn from_text(text: &str) -> Self {
-        let min_heap = Reverse(max_heap(text));
-        println!("{:#?}", min_heap);
-        HuffmanTree::empty()
+        let mut heap = min_heap(text);
+        while heap.len() > 1 {
+            let Reverse(left) = heap.pop().unwrap();
+            let Reverse(right) = heap.pop().unwrap();
+            let combined_freq = left.data().freq() + right.data().freq();
+
+            let parent = Node::node(NodeData::new('\0', combined_freq), left, right);
+            heap.push(Reverse(parent));
+        }
+
+        let root = heap.pop().map(|Reverse(node)| node);
+        HuffmanTree::new(root)
     }
 }
 
@@ -46,11 +55,11 @@ pub(crate) fn freq_map(text: &str) -> HashMap<char, u64> {
     freq_map
 }
 
-pub(crate) fn max_heap(text: &str) -> BinaryHeap<NodeData> {
+pub(crate) fn min_heap(text: &str) -> BinaryHeap<Reverse<Node>> {
     freq_map(text)
         .into_iter()
-        .fold(BinaryHeap::<NodeData>::new(), |mut heap, pair| {
-            heap.push(pair.into());
+        .fold(BinaryHeap::<Reverse<Node>>::new(), |mut heap, pair| {
+            heap.push(Reverse(Node::leaf(pair.into())));
             heap
         })
 }
@@ -67,9 +76,43 @@ mod tests {
 
     #[test]
     fn max_heap_test() {
-        let result = max_heap("aab");
+        let result = min_heap("aab");
 
-        let expected = BinaryHeap::from([NodeData::new('a', 2), NodeData::new('b', 1)]);
+        let expected = BinaryHeap::from([
+            Reverse(Node::leaf(NodeData::new('a', 2))),
+            Reverse(Node::leaf(NodeData::new('b', 1))),
+        ]);
         assert!(result.iter().eq(expected.iter()))
+    }
+
+    #[test]
+    fn huffman_tree_from_text_test() {
+        let text = "aabbbc"; // Example text
+        let tree = HuffmanTree::from_text(text);
+        println!("{:#?}", tree);
+        // Ensure the tree is not empty
+        assert!(tree.root().is_some(), "Tree root should not be None");
+
+        let root = tree.root().unwrap();
+
+        // Check if the root frequency equals the sum of character frequencies
+        let expected_freq = text.chars().count() as u64; // Total character count
+        assert_eq!(
+            root.data().freq(),
+            &expected_freq,
+            "Root frequency should match total character count"
+        );
+
+        // Optional: Check if the tree structure is valid (left and right exist)
+        if let Node::Node { left, right, .. } = root {
+            assert!(
+                left.data().freq() < root.data().freq(),
+                "Left child should have lower frequency than root"
+            );
+            assert!(
+                right.data().freq() < root.data().freq(),
+                "Right child should have lower frequency than root"
+            );
+        }
     }
 }
