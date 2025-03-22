@@ -1,7 +1,7 @@
 use std::cmp::Ordering;
 
 #[derive(Debug)]
-pub(crate) struct NodeData {
+pub struct NodeData {
     data: char,
     freq: u64,
 }
@@ -37,5 +37,17 @@ impl Eq for NodeData {}
 impl PartialEq for NodeData {
     fn eq(&self, other: &Self) -> bool {
         self.freq() == other.freq()
+    }
+}
+
+impl From<(char, u64)> for NodeData {
+    fn from(value: (char, u64)) -> Self {
+        Self::new(value.0, value.1)
+    }
+}
+
+impl From<NodeData> for (char, u64) {
+    fn from(value: NodeData) -> Self {
+        (value.data, value.freq)
     }
 }

@@ -2,7 +2,7 @@ use super::node_data::NodeData;
 use std::cmp::Ordering;
 
 #[derive(Debug)]
-pub(crate) enum Node {
+pub enum Node {
     Leaf(NodeData),
     Node {
         data: NodeData,
