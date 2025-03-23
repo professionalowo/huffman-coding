@@ -7,12 +7,16 @@ pub struct NodeData {
 }
 
 impl NodeData {
+    pub(crate) const fn internal_seperator() -> char {
+        '\0'
+    }
+
     pub fn new(data: char, freq: u64) -> Self {
         Self { data, freq }
     }
 
     pub(crate) fn internal(freq: u64) -> Self {
-        Self::new('\0', freq)
+        Self::new(Self::internal_seperator(), freq)
     }
 
     pub fn data(&self) -> &char {
