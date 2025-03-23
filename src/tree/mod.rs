@@ -1,6 +1,7 @@
 use std::{
     cmp::Reverse,
     collections::{BinaryHeap, HashMap},
+    fmt,
 };
 
 use node::Node;
@@ -8,6 +9,15 @@ use node_data::NodeData;
 
 mod node;
 mod node_data;
+
+#[derive(Debug, Clone)]
+pub struct HuffmanError(pub String);
+
+impl fmt::Display for HuffmanError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.0)
+    }
+}
 
 #[derive(Debug)]
 pub struct HuffmanTree {
@@ -31,11 +41,17 @@ impl HuffmanTree {
         self.root.as_ref()
     }
 
-    pub fn from_text(text: &str) -> Self {
+    pub fn from_text(text: &str) -> Result<Self, HuffmanError> {
         let mut heap = min_heap(text);
         while heap.len() > 1 {
-            let Reverse(left) = heap.pop().unwrap();
-            let Reverse(right) = heap.pop().unwrap();
+            let left = match heap.pop() {
+                Some(Reverse(left)) => left,
+                None => return Err(HuffmanError("Could not get next node from heap".into())),
+            };
+            let right = match heap.pop() {
+                Some(Reverse(right)) => right,
+                None => return Err(HuffmanError("Could not get next node from heap".into())),
+            };
             let combined_freq = left.data().freq() + right.data().freq();
 
             let parent = Node::node(NodeData::new('\0', combined_freq), left, right);
@@ -43,7 +59,7 @@ impl HuffmanTree {
         }
 
         let root = heap.pop().map(|Reverse(node)| node);
-        HuffmanTree::new(root)
+        Ok(HuffmanTree::new(root))
     }
 }
 
@@ -91,9 +107,9 @@ mod tests {
         let tree = HuffmanTree::from_text(text);
         println!("{:#?}", tree);
         // Ensure the tree is not empty
-        assert!(tree.root().is_some(), "Tree root should not be None");
+        assert!(tree.is_ok(), "Tree root should not be None");
 
-        let root = tree.root().unwrap();
+        let root = tree.expect("tree has to be ok").root.unwrap();
 
         // Check if the root frequency equals the sum of character frequencies
         let expected_freq = text.chars().count() as u64; // Total character count
@@ -104,7 +120,7 @@ mod tests {
         );
 
         // Optional: Check if the tree structure is valid (left and right exist)
-        if let Node::Node { left, right, .. } = root {
+        if let Node::Node { left, right, .. } = &root {
             assert!(
                 left.data().freq() < root.data().freq(),
                 "Left child should have lower frequency than root"
