@@ -11,6 +11,10 @@ impl NodeData {
         Self { data, freq }
     }
 
+    pub(crate) fn internal(freq: u64) -> Self {
+        Self::new('\0', freq)
+    }
+
     pub fn data(&self) -> &char {
         &self.data
     }

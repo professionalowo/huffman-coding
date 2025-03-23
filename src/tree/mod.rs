@@ -46,9 +46,9 @@ impl HuffmanTree {
         while heap.len() > 1 {
             let left = get_next_node(&mut heap)?;
             let right = get_next_node(&mut heap)?;
-            let combined_freq = left.data().freq() + right.data().freq();
+            let data = NodeData::internal(left.data().freq() + right.data().freq());
 
-            let parent = Node::node(NodeData::new('\0', combined_freq), left, right);
+            let parent = Node::node(data, left, right);
             heap.push(Reverse(parent));
         }
 
