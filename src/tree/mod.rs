@@ -44,14 +44,8 @@ impl HuffmanTree {
     pub fn from_text(text: &str) -> Result<Self, HuffmanError> {
         let mut heap = min_heap(text);
         while heap.len() > 1 {
-            let left = match heap.pop() {
-                Some(Reverse(left)) => left,
-                None => return Err(HuffmanError("Could not get next node from heap".into())),
-            };
-            let right = match heap.pop() {
-                Some(Reverse(right)) => right,
-                None => return Err(HuffmanError("Could not get next node from heap".into())),
-            };
+            let left = get_next_node(&mut heap)?;
+            let right = get_next_node(&mut heap)?;
             let combined_freq = left.data().freq() + right.data().freq();
 
             let parent = Node::node(NodeData::new('\0', combined_freq), left, right);
@@ -60,6 +54,13 @@ impl HuffmanTree {
 
         let root = heap.pop().map(|Reverse(node)| node);
         Ok(HuffmanTree::new(root))
+    }
+}
+
+fn get_next_node(heap: &mut BinaryHeap<Reverse<Node>>) -> Result<Node,HuffmanError> {
+    match heap.pop() {
+        Some(Reverse(left)) => Ok(left),
+        None => Err(HuffmanError("Could not get next node from heap".into())),
     }
 }
 
