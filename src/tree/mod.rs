@@ -10,6 +10,8 @@ use node_data::NodeData;
 mod node;
 mod node_data;
 
+pub type MinHeap<T> = BinaryHeap<Reverse<T>>;
+
 #[derive(Debug, Clone)]
 pub struct HuffmanError(pub String);
 
@@ -48,7 +50,7 @@ impl HuffmanTree {
     /**
      * Build a Huffman tree from a min heap
      */
-    fn build_tree(heap: &mut BinaryHeap<Reverse<Node>>) -> Result<Self, HuffmanError> {
+    fn build_tree(heap: &mut MinHeap<Node>) -> Result<Self, HuffmanError> {
         while heap.len() > 1 {
             let parent = Reverse(Self::combine_nodes(heap)?);
             heap.push(parent);
@@ -61,7 +63,7 @@ impl HuffmanTree {
     /**
      * pops the next two elements from the heap and creates a new internal node that has the first and second element as children
      */
-    fn combine_nodes(heap: &mut BinaryHeap<Reverse<Node>>) -> Result<Node, HuffmanError> {
+    fn combine_nodes(heap: &mut MinHeap<Node>) -> Result<Node, HuffmanError> {
         let left = get_next_node(heap)?;
         let right = get_next_node(heap)?;
         let data = NodeData::internal(left.data().freq() + right.data().freq());
@@ -69,7 +71,7 @@ impl HuffmanTree {
     }
 }
 
-fn get_next_node(heap: &mut BinaryHeap<Reverse<Node>>) -> Result<Node, HuffmanError> {
+fn get_next_node(heap: &mut MinHeap<Node>) -> Result<Node, HuffmanError> {
     match heap.pop() {
         Some(Reverse(left)) => Ok(left),
         None => Err(HuffmanError("Could not get next node from heap".into())),
@@ -84,10 +86,10 @@ pub(crate) fn freq_map(text: &str) -> HashMap<char, u64> {
     freq_map
 }
 
-pub(crate) fn min_heap(text: &str) -> BinaryHeap<Reverse<Node>> {
+pub(crate) fn min_heap(text: &str) -> MinHeap<Node> {
     freq_map(text)
         .into_iter()
-        .fold(BinaryHeap::<Reverse<Node>>::new(), |mut heap, pair| {
+        .fold(MinHeap::new(), |mut heap, pair| {
             heap.push(Reverse(Node::leaf(pair.into())));
             heap
         })
