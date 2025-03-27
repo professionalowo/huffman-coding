@@ -79,11 +79,10 @@ fn get_next_node(heap: &mut MinHeap<Node>) -> Result<Node, HuffmanError> {
 }
 
 pub(crate) fn freq_map(text: &str) -> HashMap<char, u64> {
-    let freq_map: HashMap<char, u64> = text.chars().fold(HashMap::new(), |mut map, c| {
+    text.chars().fold(HashMap::new(), |mut map, c| {
         *map.entry(c).or_insert(0) += 1;
         map
-    });
-    freq_map
+    })
 }
 
 pub(crate) fn min_heap(text: &str) -> MinHeap<Node> {
