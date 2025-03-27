@@ -66,8 +66,7 @@ impl HuffmanTree {
     fn combine_nodes(heap: &mut MinHeap<Node>) -> Result<Node, HuffmanError> {
         let left = get_next_node(heap)?;
         let right = get_next_node(heap)?;
-        let data = NodeData::internal(left.data().freq() + right.data().freq());
-        Ok(Node::node(data, left, right))
+        Ok(left.combine(right))
     }
 }
 

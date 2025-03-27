@@ -29,6 +29,14 @@ impl Node {
             right: Box::new(right),
         }
     }
+
+    /**
+     * Creates a new internal Node with self as left and other as right
+     */
+    pub fn combine(self, other: Self) -> Self {
+        let data = NodeData::internal(self.data().freq() + other.data().freq());
+        Self::Node { data, left: Box::new(self), right: Box::new(other) }
+    }
 }
 
 impl Ord for Node {
